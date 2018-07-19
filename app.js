@@ -15,8 +15,11 @@ onerror(app);
 
 // 路由
 const member = require('./routes/member');
+const fast = require('./routes/fast');
 app.use(member.routes(), member.allowedMethods());
+app.use(fast.routes(), fast.allowedMethods());
 
+// 打印日志
 app.use(async (ctx, next) => {
     const start = Date.now();
     await next();
@@ -24,7 +27,6 @@ app.use(async (ctx, next) => {
     ctx.set('X-Response-Time', `${ms}ms`);
 });
 
-// 打印日志
 app.use(async (ctx, next) => {
     const start = Date.now();
     await next();

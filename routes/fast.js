@@ -34,7 +34,6 @@ router.get('/weibo', async (ctx, next) => {
             isGet = false;
         }
     }
-
     if (isGet) {
         SAVE_DATA.weibo[id] = {};
         SAVE_DATA.weibo[id].date = new Date().getTime();

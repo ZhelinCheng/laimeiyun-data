@@ -5,11 +5,12 @@
 const config = require('./config');
 const json = require('koa-json');
 const onerror = require('koa-onerror');
+const bodyParser = require('koa-bodyparser');
 const Koa = require('koa');
 const app = new Koa();
 
 // 中间件
-app.use(require('koa-bodyparser')());
+app.use(bodyParser({multipart: true}))
 app.use(json());
 onerror(app);
 
@@ -24,6 +25,7 @@ app.use(async (ctx, next) => {
     const start = Date.now();
     await next();
     const ms = Date.now() - start;
+
     ctx.set('X-Response-Time', `${ms}ms`);
 });
 
@@ -31,7 +33,8 @@ app.use(async (ctx, next) => {
     const start = Date.now();
     await next();
     const ms = Date.now() - start;
-    console.log(`${ctx.method} ${ctx.url} - ${ms}`);
+
+    console.log(`${ctx.method} ${ctx.url} - ${ms}ms`);
 });
 
 // 错误监听

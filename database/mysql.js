@@ -22,30 +22,28 @@ async function query (sql) {
 async function queryMemberInfo (id) {
     let data = {};
 
-    let sql = `SELECT member.*, 
-            day.baidu_index, 
-            day.xunyi_index,
-            day.weibo_index,
-            day.weibo_power,
-            hour.baike_browse,
-            hour.baike_flowers,
-            hour.weibo_forward,
-            hour.weibo_comment,
-            hour.weibo_like,
-            hour.weibo_fans,
-            hour.doki_fans
-            FROM laimeiyun_data.member 
-            LEFT JOIN laimeiyun_data.day
-            ON member.id = day.id
-            LEFT JOIN laimeiyun_data.hour
-            ON day.id = hour.id
-            ${id ? 'WHERE member.id =' + id : ''}
-            ORDER BY hour.create_date desc 
-            LIMIT ${id ? 1 : 12}
-            `;
-
+    let sql = `SELECT 
+                rg_member.*, 
+                rg_day.baidu_index, 
+                rg_day.xunyi_index,
+                rg_day.weibo_index,
+                rg_day.weibo_power,
+                rg_hour.baike_browse,
+                rg_hour.baike_flowers,
+                rg_hour.weibo_forward,
+                rg_hour.weibo_comment,
+                rg_hour.weibo_like,
+                rg_hour.weibo_fans,
+                rg_hour.doki_fans
+                FROM laimeiyun_data.rg_member AS rg_member, 
+                laimeiyun_data.rg_day AS rg_day, 
+                laimeiyun_data.rg_hour AS rg_hour
+                WHERE rg_member.id = rg_hour.id
+                AND rg_member.id = rg_day.id
+                ${ id ? 'AND rg_member.id = ' + id : '' }
+                ORDER BY rg_hour.create_date desc, rg_day.create_date desc 
+                LIMIT ${ id ? 1 : 12 }`;
     data.list = await query(sql);
-
     return data
 }
 
@@ -64,7 +62,7 @@ async function queryMemberDayData (id, type) {
     let data = {};
     data[id] = await query(
         `SELECT create_date,baidu_index,xunyi_index,weibo_index,weibo_power 
-        FROM laimeiyun_data.day 
+        FROM laimeiyun_data.rg_day 
         WHERE id = ${id} 
         ORDER BY create_date desc LIMIT 0,${page_size}`);
 
@@ -78,7 +76,7 @@ async function queryMemberHourData (id) {
     data[id] = await query(
         `SELECT 
         create_date,baike_browse,baike_flowers,weibo_forward,weibo_comment,weibo_like,weibo_fans,doki_fans 
-        FROM laimeiyun_data.hour 
+        FROM laimeiyun_data.rg_hour 
         WHERE id = ${id} 
         ORDER BY create_date desc LIMIT 0,24`
     );

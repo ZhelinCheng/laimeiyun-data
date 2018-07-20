@@ -3,7 +3,7 @@
  */
 
 const config = require('./config');
-const json = require('koa-json');
+// const json = require('koa-json');
 const onerror = require('koa-onerror');
 const bodyParser = require('koa-bodyparser');
 const helmet = require("koa-helmet");
@@ -32,7 +32,7 @@ app.use(async (ctx, next) => {
 // 中间件
  app.use(safety());
 app.use(bodyParser({multipart: true}))
-app.use(json());
+// app.use(json());
 app.use(helmet());
 onerror(app);
 

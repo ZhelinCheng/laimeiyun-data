@@ -9,10 +9,12 @@ async function query (sql) {
     const connection = await mysql.createConnection({
         ...database
     });
+
     let [rows] = await connection.execute(sql);
 
     connection.end();
     rows = JSON.stringify(rows);
+
     return JSON.parse(rows)
 }
 

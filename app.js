@@ -30,7 +30,7 @@ app.use(async (ctx, next) => {
 });
 
 // 中间件
- app.use(safety());
+// app.use(safety());
 app.use(bodyParser({multipart: true}))
 // app.use(json());
 app.use(helmet());

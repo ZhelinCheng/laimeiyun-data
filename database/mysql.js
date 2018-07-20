@@ -42,10 +42,23 @@ async function queryMemberInfo (id) {
                 AND rg_member.id = rg_day.id
                 ${ id ? 'AND rg_member.id = ' + id : '' }
                 ORDER BY rg_hour.create_date desc, rg_day.create_date desc 
-                LIMIT ${ id ? 1 : 12 }`;
+                LIMIT ${ id ? 1 : 11 }`;
     data.list = await query(sql);
     return data
 }
+
+// 查询成员基本信息
+async function queryMemberBase (id) {
+    let data = {};
+
+    let sql = `SELECT *
+                FROM laimeiyun_data.rg_member AS rg_member
+                ${ id ? 'WHERE rg_member.id = ' + id : '' }
+                LIMIT ${ id ? 1 : 11 }`;
+    data.list = await query(sql);
+    return data
+}
+
 
 // 查询成员每日数据
 async function queryMemberDayData (id, type) {
@@ -87,6 +100,7 @@ async function queryMemberHourData (id) {
 
 module.exports = {
     query,
+    queryMemberBase,
     queryMemberInfo,
     queryMemberDayData,
     queryMemberHourData

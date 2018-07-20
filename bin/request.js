@@ -6,14 +6,13 @@
 
 const rp = require('request-promise-native');
 
-const request = async function (params, referer) {
+const request = async function (params, referer = 'https://www.baidu.com') {
     return await rp({
         ...params,
         headers: {
-            'Accept': 'application/json',
+            'Accept': '*',
             'Accept-Language': 'zh-CN,zh;q=0.9',
             'Connection': 'keep-alive',
-            'Content-Type': 'application/x-www-form-urlencoded',
             'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
             'X-Requested-With': 'XMLHttpRequest',
             'Referer': referer

@@ -2,9 +2,8 @@
   "port": 3030,
   "version": "v1",
   "database": {
-    "host": "localhost",
-    "port": 6379,
-    "number": "",
-    "password": ""
+    "host": "192.168.26.129",
+    "user": "test",
+    "password": "123456"
   }
 }

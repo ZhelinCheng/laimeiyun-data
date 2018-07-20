@@ -12,6 +12,7 @@
     "debug": "^3.1.0",
     "koa": "^2.5.2",
     "koa-bodyparser": "^4.2.1",
+    "koa-helmet": "^4.0.0",
     "koa-json": "^2.0.2",
     "koa-onerror": "^4.0.0",
     "koa-ratelimit": "^4.1.2",

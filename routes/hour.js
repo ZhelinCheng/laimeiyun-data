@@ -6,13 +6,16 @@ const Router = require('koa-router');
 const router = new Router();
 
 let {version} = require('../config');
-router.prefix(`/${version}/member`);
+router.prefix(`/${version}/hour`);
 
-const { queryMemberInfo } = require('../database/mysql.js');
+const { queryMemberHourData } = require('../database/mysql.js');
 
-// 获取指定成员信息
+// 缓存数据
+let SAVE_DATA = {};
+
+// 获取指定成员小时数据24h
 router.get('/', async (ctx, next) => {
-    let data = await queryMemberInfo(ctx.query.id);
+    let data = await queryMemberHourData(ctx.query.id);
     next();
     ctx.body = data
 });

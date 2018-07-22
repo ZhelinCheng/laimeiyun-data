@@ -14,8 +14,8 @@ const { queryMemberHourData } = require('../database/mysql.js');
 let SAVE_DATA = {};
 
 // 获取指定成员小时数据24h
-router.get('/', async (ctx, next) => {
-    let data = await queryMemberHourData(ctx.query.id);
+router.get('/:id', async (ctx, next) => {
+    let data = await queryMemberHourData(ctx.params.id);
     next();
     ctx.body = data
 });

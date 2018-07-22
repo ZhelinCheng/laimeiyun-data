@@ -37,10 +37,10 @@ app.use(helmet());
 onerror(app);
 
 // 路由
-const member = require('./routes/member');
-const fast = require('./routes/fast');
-const day = require('./routes/day');
-const hour = require('./routes/hour');
+const member = require('./routes/ApiMember');
+const fast = require('./routes/ApiFast');
+const day = require('./routes/ApiDay');
+const hour = require('./routes/ApiHour');
 app.use(member.routes(), member.allowedMethods());
 app.use(fast.routes(), fast.allowedMethods());
 app.use(day.routes(), day.allowedMethods());

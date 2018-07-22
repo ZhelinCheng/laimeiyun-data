@@ -5,50 +5,117 @@
 const mysql = require('mysql2/promise');
 const {database} = require('../config');
 
-async function query (sql) {
+async function query (sql, cb) {
     const connection = await mysql.createConnection({
         ...database
     });
 
     let [rows] = await connection.execute(sql);
 
-    connection.end();
-    rows = JSON.stringify(rows);
 
-    return JSON.parse(rows)
+    rows = JSON.stringify(rows);
+    rows = rows.replace(/\\"/img, '"').replace(/"{/img, '{').replace(/}"/img, '}');
+
+    if (typeof cb === 'function') {
+        return await cb(JSON.parse(rows), connection)
+    } else {
+        connection.end();
+        return JSON.parse(rows)
+    }
 }
 
 // 查询成员信息
 async function queryMemberInfo (id) {
+    if (id === 'all') id = null;
+
     let data = {};
 
     let sql = `SELECT 
-                rg_member.*, 
-                rg_day.baidu_index, 
-                rg_day.xunyi_index,
-                rg_day.weibo_index,
-                rg_day.weibo_power,
+                rg_member.id, 
+                rg_member.name, 
+                rg_member.head_pic, 
+                rg_member.weibo_index_id, 
+                
+                UNIX_TIMESTAMP(rg_hour.create_date) AS create_hour,
                 rg_hour.baike_browse,
                 rg_hour.baike_flowers,
                 rg_hour.weibo_forward,
                 rg_hour.weibo_comment,
                 rg_hour.weibo_like,
                 rg_hour.weibo_fans,
-                rg_hour.doki_fans
+                rg_hour.doki_fans,
+                
+                UNIX_TIMESTAMP(rg_day.create_date) AS create_day,
+                rg_day.weibo_ring,
+                rg_day.weibo_total,
+                rg_day.weibo_read,
+                rg_day.weibo_int,
+                rg_day.weibo_inf,
+                rg_day.weibo_love,
+                rg_day.weibo_index
+                
                 FROM laimeiyun_data.rg_member AS rg_member, 
                 laimeiyun_data.rg_day AS rg_day, 
                 laimeiyun_data.rg_hour AS rg_hour
                 WHERE rg_member.id = rg_hour.id
                 AND rg_member.id = rg_day.id
                 ${ id ? 'AND rg_member.id = ' + id : '' }
-                ORDER BY rg_hour.create_date desc, rg_day.create_date desc 
+                ORDER BY rg_day.create_date desc, rg_hour.create_date desc, rg_member.id
                 LIMIT ${ id ? 1 : 11 }`;
-    data.list = await query(sql);
+
+    data.list = await query(sql, async (items, connection)=> {
+        let saveData = items.map(async item => {
+            let [rows] = await connection.execute(
+                `SELECT 
+                rg_member.id, 
+                rg_member.name, 
+
+                UNIX_TIMESTAMP(rg_hour.create_date) AS create_hour,
+                rg_hour.baike_browse,
+                rg_hour.baike_flowers,
+                rg_hour.weibo_forward,
+                rg_hour.weibo_comment,
+                rg_hour.weibo_like,
+                rg_hour.weibo_fans,
+                rg_hour.doki_fans,
+                
+                UNIX_TIMESTAMP(rg_day.create_date) AS create_day,
+                rg_day.weibo_ring,
+                rg_day.weibo_total,
+                rg_day.weibo_read,
+                rg_day.weibo_int,
+                rg_day.weibo_inf,
+                rg_day.weibo_love,
+                rg_day.weibo_index
+                
+                FROM laimeiyun_data.rg_member AS rg_member, 
+                laimeiyun_data.rg_day AS rg_day, 
+                laimeiyun_data.rg_hour AS rg_hour
+                WHERE rg_member.id = rg_hour.id
+                AND rg_member.id = rg_day.id
+                AND rg_member.id = ${item.id}
+                ORDER BY rg_day.create_date desc , rg_hour.create_date desc, rg_member.id
+                LIMIT 1,1`
+            );
+
+            rows = JSON.stringify(rows);
+            rows = rows.replace(/\\"/img, '"').replace(/"{/img, '{').replace(/}"/img, '}');
+            item.prev_data = JSON.parse(rows);
+            return item
+        });
+        let saveList = [];
+        for (const itemPromise of saveData) {
+            saveList.push( await itemPromise)
+        }
+        connection.end();
+        return saveList;
+    });
     return data
 }
 
 // 查询成员基本信息
 async function queryMemberBase (id) {
+    if (id === 'all') id = null;
     let data = {};
 
     let sql = `SELECT *
@@ -58,7 +125,6 @@ async function queryMemberBase (id) {
     data.list = await query(sql);
     return data
 }
-
 
 // 查询成员每日数据
 async function queryMemberDayData (id, type) {
@@ -73,11 +139,15 @@ async function queryMemberDayData (id, type) {
     }
 
     let data = {};
-    data[id] = await query(
-        `SELECT create_date,baidu_index,xunyi_index,weibo_index,weibo_power 
+    data['list'] = await query(
+        `SELECT 
+        id,
+        UNIX_TIMESTAMP(create_date) AS create_date,
+        weibo_ring,weibo_total,weibo_read,weibo_int,weibo_inf,weibo_love,weibo_index
         FROM laimeiyun_data.rg_day 
         WHERE id = ${id} 
-        ORDER BY create_date desc LIMIT 0,${page_size}`);
+        ORDER BY create_date desc 
+        LIMIT 0,${page_size}`);
 
     return data
 }
@@ -88,7 +158,9 @@ async function queryMemberHourData (id) {
     let data = {};
     data[id] = await query(
         `SELECT 
-        create_date,baike_browse,baike_flowers,weibo_forward,weibo_comment,weibo_like,weibo_fans,doki_fans 
+        id,
+        UNIX_TIMESTAMP(create_date) AS create_date,
+        baike_browse,baike_flowers,weibo_forward,weibo_comment,weibo_like,weibo_fans,doki_fans
         FROM laimeiyun_data.rg_hour 
         WHERE id = ${id} 
         ORDER BY create_date desc LIMIT 0,24`
@@ -108,7 +180,7 @@ module.exports = {
 
 if (require.main === module) {
     (async () => {
-        let data = await queryMemberDayData(1);
+        let data = await queryMemberDayData(1, 'month');
         console.log(data)
     })()
 }

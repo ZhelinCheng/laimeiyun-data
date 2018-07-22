@@ -20,11 +20,11 @@ let SAVE_DATA = {};
 
 
 // 获取微博小时数据接口
-router.get('/weibo', async (ctx, next) => {
+router.get('/weibo/:id', async (ctx, next) => {
     if (!SAVE_DATA.weibo) SAVE_DATA.weibo = {};
 
     let data = {};
-    let id = ctx.query.id;
+    let id = ctx.params.id;
     let save = SAVE_DATA.weibo[id];
     let isGet = true;
 

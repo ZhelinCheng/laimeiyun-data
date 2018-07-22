@@ -11,8 +11,9 @@ router.prefix(`/${version}/day`);
 const { queryMemberDayData } = require('../database/mysql.js');
 
 // 获取指定成员天数据
-router.get('/', async (ctx, next) => {
-    let data = await queryMemberDayData(ctx.query.id, ctx.query.type);
+router.get('/:type/:id', async (ctx, next) => {
+
+    let data = await queryMemberDayData(ctx.params.id, ctx.params.type);
     next();
     ctx.body = data
 });

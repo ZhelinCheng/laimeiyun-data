@@ -14,25 +14,22 @@ const { verificationId } = require("../bin/safety");
 
 // 获取指定成员信息
 router.get('/info/:id', async (ctx, next) => {
-    let data = {};
     let id = ctx.params.id;
-    if (verificationId(id)) {
-        data = await queryMemberInfo(id);
+    if (verificationId(id) && !ctx.body) {
+        ctx.body = await queryMemberInfo(id);
     }
-    next();
-    ctx.body = data
+    await next();
 });
 
 // 获取指定成员基本信息
 router.get('/base/:id', async (ctx, next) => {
-    let data = {};
     let id = ctx.params.id;
-    if (verificationId(id)) {
-        data = await queryMemberBase(id);
+
+    if (verificationId(id) && !ctx.body) {
+        ctx.body = await queryMemberBase(id);
     }
 
-    next();
-    ctx.body = data
+    await next();
 });
 
 

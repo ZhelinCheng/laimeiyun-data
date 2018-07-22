@@ -16,28 +16,11 @@ router.prefix(`/${version}/fast`);
 
 let SAVE_DATA = {};
 
-// 获取数据方法
-
-
 // 获取微博小时数据接口
 router.get('/weibo/:id', async (ctx, next) => {
-    if (!SAVE_DATA.weibo) SAVE_DATA.weibo = {};
-
-    let data = {};
     let id = ctx.params.id;
-    let save = SAVE_DATA.weibo[id];
-    let isGet = true;
-
-    if (save) {
-        if ( new Date().getTime() - SAVE_DATA.weibo[id].date < 300000) {
-            data = SAVE_DATA.weibo[id].data;
-            isGet = false;
-        }
-    }
-    if (isGet) {
-        SAVE_DATA.weibo[id] = {};
-        SAVE_DATA.weibo[id].date = new Date().getTime();
-        data = await rp({
+    if (/^\d{6,}$/.test(id) && !ctx.body) {
+        let data = await rp({
             url: 'http://data.weibo.com/index/ajax/newindex/getchartdata',
             method: 'POST',
             formData: {
@@ -57,13 +40,10 @@ router.get('/weibo/:id', async (ctx, next) => {
             res.list.push(item.trend)
         }
 
-
-        SAVE_DATA.weibo[id].data = res;
-        data = SAVE_DATA.weibo[id].data;
+        ctx.body = res;
     }
 
     await next();
-    ctx.body = data;
 });
 
 

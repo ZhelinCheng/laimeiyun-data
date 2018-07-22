@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "./node_modules/.bin/nodemon app",
-    "start": "NODE_ENV=production pm2 start app.js --name 'data.laimeiyun.cn' --no-autorestart",
+    "start": "NODE_ENV=production pm2 start app.js --name 'api.laimeiyun.cn' --no-autorestart",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {

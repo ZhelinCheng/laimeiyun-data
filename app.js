@@ -8,6 +8,7 @@ const onerror = require('koa-onerror');
 const bodyParser = require('koa-bodyparser');
 const helmet = require("koa-helmet");
 const { safety } = require("./bin/safety");
+const cache = require("./bin/cache");
 const Koa = require('koa');
 const app = new Koa();
 
@@ -30,7 +31,7 @@ app.use(async (ctx, next) => {
 });
 
 // 中间件
-// app.use(safety());
+app.use(cache());
 app.use(helmet());
 app.use(bodyParser({multipart: true}))
 // app.use(json());
@@ -51,10 +52,9 @@ app.on('error', (err, ctx) => {
     console.error('server error', err, ctx)
 });
 
-
-// response
+// 缓存数据
 /*app.use(async ctx => {
-    ctx.body = ``
+    console.log(111, ctx.path)
 });*/
 
 

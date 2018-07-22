@@ -67,8 +67,6 @@ async function queryMemberInfo (id) {
         let saveData = items.map(async item => {
             let [rows] = await connection.execute(
                 `SELECT 
-                rg_member.id, 
-                rg_member.name, 
 
                 UNIX_TIMESTAMP(rg_hour.create_date) AS create_hour,
                 rg_hour.baike_browse,
@@ -100,12 +98,12 @@ async function queryMemberInfo (id) {
 
             rows = JSON.stringify(rows);
             rows = rows.replace(/\\"/img, '"').replace(/"{/img, '{').replace(/}"/img, '}');
-            item.prev_data = JSON.parse(rows);
+            item.prev_data = JSON.parse(rows)[0];
             return item
         });
         let saveList = [];
         for (const itemPromise of saveData) {
-            saveList.push( await itemPromise)
+            saveList.push(await itemPromise)
         }
         connection.end();
         return saveList;

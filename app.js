@@ -7,7 +7,7 @@ const config = require('./config');
 const onerror = require('koa-onerror');
 const bodyParser = require('koa-bodyparser');
 const helmet = require("koa-helmet");
-const safety = require("./bin/safety");
+const { safety } = require("./bin/safety");
 const Koa = require('koa');
 const app = new Koa();
 
@@ -31,9 +31,9 @@ app.use(async (ctx, next) => {
 
 // 中间件
 // app.use(safety());
+app.use(helmet());
 app.use(bodyParser({multipart: true}))
 // app.use(json());
-app.use(helmet());
 onerror(app);
 
 // 路由
@@ -53,9 +53,9 @@ app.on('error', (err, ctx) => {
 
 
 // response
-app.use(async ctx => {
-    ctx.body = 'Hello World';
-});
+/*app.use(async ctx => {
+    ctx.body = ``
+});*/
 
 
 app.listen(config.port);

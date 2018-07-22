@@ -9,13 +9,18 @@ let {version} = require('../config');
 router.prefix(`/${version}/hour`);
 
 const { queryMemberHourData } = require('../database/mysql.js');
+const { verificationId } = require("../bin/safety");
 
 // 缓存数据
 let SAVE_DATA = {};
 
 // 获取指定成员小时数据24h
 router.get('/:id', async (ctx, next) => {
-    let data = await queryMemberHourData(ctx.params.id);
+    let data = {};
+    if (verificationId(ctx.params.id)) {
+        data = await queryMemberHourData(ctx.params.id);
+    }
+
     next();
     ctx.body = data
 });

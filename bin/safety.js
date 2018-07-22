@@ -5,29 +5,23 @@
 'use strict';
 function safety () {
     return async (ctx, next) => {
-        try {
-            ctx.query.id = parseInt(ctx.query.id);
-            console.log(!ctx.query.id);
+        /*try {
 
-            if (!ctx.query.id) {
-                ctx.response.status = 403;
-                ctx.response.body = '403 请求非法！';
-            } else {
-                await next()
-            }
+            /!*ctx.response.status = 403;
+            ctx.response.body = '403 请求非法！';*!/
         } catch (err) {
             // handle err
-        }
+        }*/
+        //console.log(ctx.params)
+        await next()
     }
 }
 
-module.exports = safety;
+function verificationId (id) {
+    return /^(all|\d{1,2})$/.test(id)
+}
 
-/*
-module.exports = async (ctx, next) => {
-    if (!ctx.query.id) {
-        ctx.response.status = 404;
-        ctx.response.body = 'Page Not Found';
-    }
-    //await next();
-}*/
+module.exports = {
+    safety,
+    verificationId
+};

@@ -63,6 +63,7 @@ async function queryMemberInfo (id) {
                 ORDER BY rg_day.create_date desc, rg_hour.create_date desc, rg_member.id
                 LIMIT ${ id ? 1 : 11 }`;
 
+    let timeStamp = new Date(new Date().setHours(0, 0, 0, 0)) / 1000;
     data.list = await query(sql, async (items, connection)=> {
         let saveData = items.map(async item => {
             let [rows] = await connection.execute(
@@ -89,11 +90,15 @@ async function queryMemberInfo (id) {
                 FROM laimeiyun_data.rg_member AS rg_member, 
                 laimeiyun_data.rg_day AS rg_day, 
                 laimeiyun_data.rg_hour AS rg_hour
-                WHERE rg_member.id = rg_hour.id
+                WHERE 
+					 rg_member.id = ${item.id}
+					 AND UNIX_TIMESTAMP(rg_day.create_date) < ${timeStamp}
+					 AND UNIX_TIMESTAMP(rg_hour.create_date) < ${timeStamp}
+					 AND rg_member.id = rg_hour.id
                 AND rg_member.id = rg_day.id
-                AND rg_member.id = ${item.id}
-                ORDER BY rg_day.create_date desc , rg_hour.create_date desc, rg_member.id
-                LIMIT 1,1`
+                
+                ORDER BY rg_hour.create_date desc
+                LIMIT 1`
             );
 
             rows = JSON.stringify(rows);

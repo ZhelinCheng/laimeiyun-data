@@ -67,7 +67,7 @@ async function queryMemberInfo (id) {
 
     let timeStamp = new Date(new Date().setHours(0, 0, 0, 0)) / 1000;
     let date = new Date();
-    if (date.getHours() <= 11) {
+    if (date.getHours() <= 10) {
        if (date.getMinutes() <= 7) {
            timeStamp = timeStamp - 86400;
        }

@@ -70,16 +70,6 @@ async function queryMemberInfo (id) {
                 ORDER BY rg_day.create_date desc, rg_hour.create_date desc, rg_member.id
                 LIMIT ${ id ? 1 : 11 }`;
 
-
-
-    let timeStamp = new Date(new Date().setHours(0, 0, 0, 0)) / 1000;
-    let date = new Date();
-    if (date.getHours() <= 10) {
-       if (date.getMinutes() <= 7) {
-           timeStamp = timeStamp - 86400;
-       }
-    }
-
     data.list = await query(sql, async (items, connection)=> {
         let saveData = items.map(async item => {
             let queryHourItem = connection.execute(

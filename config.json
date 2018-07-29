@@ -2,7 +2,7 @@
   "port": 3040,
   "version": "v1",
   "database": {
-    "host": "192.168.26.129",
+    "host": "10.0.0.107",
     "user": "test",
     "password": "123456",
     "database": "laimeiyun_data"

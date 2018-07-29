@@ -24,6 +24,13 @@ async function query (sql, cb) {
     }
 }
 
+// 清洗数据
+function cleanData(val) {
+    let rows = JSON.stringify(val);
+    rows = rows.replace(/\\"/img, '"').replace(/"{/img, '{').replace(/}"/img, '}');
+    return JSON.parse(rows)[0]
+}
+
 // 查询成员信息
 async function queryMemberInfo (id) {
     if (id === 'all') id = null;
@@ -46,13 +53,13 @@ async function queryMemberInfo (id) {
                 rg_hour.doki_fans,
                 
                 UNIX_TIMESTAMP(rg_day.create_date) AS create_day,
+                rg_day.weibo_index,
                 rg_day.weibo_ring,
                 rg_day.weibo_total,
                 rg_day.weibo_read,
                 rg_day.weibo_int,
                 rg_day.weibo_inf,
-                rg_day.weibo_love,
-                rg_day.weibo_index
+                rg_day.weibo_love
                 
                 FROM laimeiyun_data.rg_member AS rg_member, 
                 laimeiyun_data.rg_day AS rg_day, 
@@ -67,7 +74,7 @@ async function queryMemberInfo (id) {
 
     let timeStamp = new Date(new Date().setHours(0, 0, 0, 0)) / 1000;
     let date = new Date();
-    if (date.getHours() <= 11) {
+    if (date.getHours() <= 10) {
        if (date.getMinutes() <= 7) {
            timeStamp = timeStamp - 86400;
        }
@@ -75,9 +82,8 @@ async function queryMemberInfo (id) {
 
     data.list = await query(sql, async (items, connection)=> {
         let saveData = items.map(async item => {
-            let [rows] = await connection.execute(
+            let queryHourItem = connection.execute(
                 `SELECT 
-
                 UNIX_TIMESTAMP(rg_hour.create_date) AS create_hour,
                 rg_hour.baike_browse,
                 rg_hour.baike_flowers,
@@ -85,33 +91,36 @@ async function queryMemberInfo (id) {
                 rg_hour.weibo_comment,
                 rg_hour.weibo_like,
                 rg_hour.weibo_fans,
-                rg_hour.doki_fans,
-                
+                rg_hour.doki_fans
+                FROM laimeiyun_data.rg_hour AS rg_hour
+                WHERE rg_hour.id = ${item.id}
+                ORDER BY rg_hour.create_date desc
+                LIMIT 1,1`
+            );
+            let queryDayItem = connection.execute(
+                `SELECT
                 UNIX_TIMESTAMP(rg_day.create_date) AS create_day,
+                 rg_day.weibo_index,
                 rg_day.weibo_ring,
                 rg_day.weibo_total,
                 rg_day.weibo_read,
                 rg_day.weibo_int,
                 rg_day.weibo_inf,
-                rg_day.weibo_love,
-                rg_day.weibo_index
-                
-                FROM laimeiyun_data.rg_member AS rg_member, 
-                laimeiyun_data.rg_day AS rg_day, 
-                laimeiyun_data.rg_hour AS rg_hour
-                WHERE 
-					 rg_member.id = ${item.id}
-					 AND UNIX_TIMESTAMP(rg_day.create_date) < ${timeStamp}
-					 AND rg_member.id = rg_hour.id
-                AND rg_member.id = rg_day.id
-                
-                ORDER BY rg_hour.create_date desc
+                rg_day.weibo_love
+                FROM laimeiyun_data.rg_day AS rg_day
+                WHERE rg_day.id = ${item.id}
+                ORDER BY rg_day.create_date desc
                 LIMIT 1,1`
             );
+            let [hourRows] = cleanData(await queryHourItem);
+            let [dayRows] = cleanData(await queryDayItem);
 
-            rows = JSON.stringify(rows);
-            rows = rows.replace(/\\"/img, '"').replace(/"{/img, '{').replace(/}"/img, '}');
-            item.prev_data = JSON.parse(rows)[0];
+            let rows = {
+                ...hourRows,
+                ...dayRows
+            };
+
+            item.prev_data = rows;
             return item
         });
         let saveList = [];
@@ -191,7 +200,7 @@ module.exports = {
 
 if (require.main === module) {
     (async () => {
-        let data = await queryMemberDayData(1, 'month');
+        let data = await queryMemberInfo(1);
         console.log(data)
     })()
 }

@@ -3,9 +3,9 @@
  */
 
 const mysql = require('mysql2/promise');
-const {database} = require('../config');
+const { database } = require('../config');
 
-async function query (sql, cb) {
+async function query(sql, cb) {
     const connection = await mysql.createConnection({
         ...database
     });
@@ -32,7 +32,7 @@ function cleanData(val) {
 }
 
 // 查询成员信息
-async function queryMemberInfo (id) {
+async function queryMemberInfo(id) {
     if (id === 'all') id = null;
 
     let data = {};
@@ -51,6 +51,10 @@ async function queryMemberInfo (id) {
                 rg_hour.weibo_like,
                 rg_hour.weibo_fans,
                 rg_hour.doki_fans,
+                rg_hour.super_rank,
+                rg_hour.super_read,
+                rg_hour.super_post,
+                rg_hour.super_fans,
                 
                 UNIX_TIMESTAMP(rg_day.create_date) AS create_day,
                 rg_day.weibo_index,
@@ -70,7 +74,16 @@ async function queryMemberInfo (id) {
                 ORDER BY rg_day.create_date desc, rg_hour.create_date desc, rg_member.id
                 LIMIT ${ id ? 1 : 11 }`;
 
-    data.list = await query(sql, async (items, connection)=> {
+
+    let timeStamp = new Date(new Date().setHours(0, 0, 0, 0)) / 1000;
+    let date = new Date();
+    if (date.getHours() <= 10) {
+        if (date.getMinutes() <= 7) {
+            timeStamp = timeStamp - 86400;
+        }
+    }
+
+    data.list = await query(sql, async (items, connection) => {
         let saveData = items.map(async item => {
             let queryHourItem = connection.execute(
                 `SELECT 
@@ -81,7 +94,11 @@ async function queryMemberInfo (id) {
                 rg_hour.weibo_comment,
                 rg_hour.weibo_like,
                 rg_hour.weibo_fans,
-                rg_hour.doki_fans
+                rg_hour.doki_fans,
+                rg_hour.super_rank,
+                rg_hour.super_read,
+                rg_hour.super_post,
+                rg_hour.super_fans
                 FROM laimeiyun_data.rg_hour AS rg_hour
                 WHERE rg_hour.id = ${item.id}
                 ORDER BY rg_hour.create_date desc
@@ -124,7 +141,7 @@ async function queryMemberInfo (id) {
 }
 
 // 查询成员基本信息
-async function queryMemberBase (id) {
+async function queryMemberBase(id) {
     if (id === 'all') id = null;
     let data = {};
 
@@ -137,7 +154,7 @@ async function queryMemberBase (id) {
 }
 
 // 查询成员每日数据
-async function queryMemberDayData (id, type) {
+async function queryMemberDayData(id, type) {
     let page_size = 1;
     switch (type) {
         case 'month':
@@ -163,17 +180,17 @@ async function queryMemberDayData (id, type) {
 }
 
 // 查询成员24小时数据
-async function queryMemberHourData (id) {
+async function queryMemberHourData(id) {
 
     let data = {};
     data['list'] = await query(
         `SELECT 
         id,
         UNIX_TIMESTAMP(create_date) AS create_date,
-        baike_browse,baike_flowers,weibo_forward,weibo_comment,weibo_like,weibo_fans,doki_fans
+        baike_browse,baike_flowers,weibo_forward,weibo_comment,weibo_like,weibo_fans,doki_fans,super_rank,super_read,super_post,super_fans
         FROM laimeiyun_data.rg_hour 
         WHERE id = ${id} 
-        ORDER BY create_date desc LIMIT 0,24`
+        ORDER BY create_date desc LIMIT 0,25`
     );
 
     return data

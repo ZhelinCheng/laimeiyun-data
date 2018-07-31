@@ -23,7 +23,6 @@ function cache() {
 
         if (!data && ctx.body) {
             // 没有缓存
-            console.log(111);
             SAVE_CACHE[ctx.path] = {
                 date: now,
                 data: ctx.body

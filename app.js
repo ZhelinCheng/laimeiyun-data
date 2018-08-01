@@ -11,6 +11,7 @@ const { safety } = require("./bin/safety");
 const cache = require("./bin/cache");
 const Koa = require('koa');
 const app = new Koa();
+const { formatTimeStamp } = require("./tools/tools");
 
 // 打印日志
 app.use(async (ctx, next) => {
@@ -26,14 +27,13 @@ app.use(async (ctx, next) => {
     const start = Date.now();
     await next();
     const ms = Date.now() - start;
-
-    console.log(`${ctx.method} ${ctx.url} - ${ms}ms`);
+    console.log(`[${formatTimeStamp(new Date().getTime(), 'yyyy-MM-dd hh:mm:ss')}] ${ctx.method} ${ctx.url} - ${ms}ms`);
 });
 
 // 中间件
 app.use(cache());
 app.use(helmet());
-app.use(bodyParser({multipart: true}))
+app.use(bodyParser({multipart: true}));
 // app.use(json());
 onerror(app);
 

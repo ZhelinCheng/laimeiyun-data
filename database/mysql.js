@@ -42,6 +42,7 @@ async function queryMemberInfo(id) {
                 rg_member.name, 
                 rg_member.head_pic, 
                 rg_member.weibo_index_id, 
+                rg_member.power_list, 
                 
                 UNIX_TIMESTAMP(rg_hour.create_date) AS create_hour,
                 rg_hour.baike_browse,

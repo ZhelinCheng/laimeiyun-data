@@ -149,10 +149,10 @@ async function queryMemberDayData(id, type) {
     let page_size = 1;
     switch (type) {
         case 'month':
-            page_size = 30;
+            page_size = 31;
             break;
         case 'week':
-            page_size = 7;
+            page_size = 8;
             break;
     }
 

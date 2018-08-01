@@ -9,12 +9,13 @@ let {version} = require('../config');
 router.prefix(`/${version}/hour`);
 
 const { queryMemberHourData } = require('../database/mysql.js');
-const { verificationId } = require("../bin/safety");
 
-// 获取指定成员小时数据24h
-router.get('/:id', async (ctx, next) => {
-    if (verificationId(ctx.params.id) && !ctx.body) {
-        ctx.body = await queryMemberHourData(ctx.params.id);
+// 获取指定成员小时数据24h/一个月
+router.get('/:type/:id', async (ctx, next) => {
+    let type = ctx.params.type;
+    let id = ctx.params.id;
+    if (/^(\d{1,2})$/.test(id) && /^(month|day)$/.test(type) && !ctx.body) {
+        ctx.body = await queryMemberHourData(id, type);
     }
     await next();
 });

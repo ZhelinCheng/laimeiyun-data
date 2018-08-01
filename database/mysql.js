@@ -71,17 +71,8 @@ async function queryMemberInfo(id) {
                 WHERE rg_member.id = rg_hour.id
                 AND rg_member.id = rg_day.id
                 ${ id ? 'AND rg_member.id = ' + id : '' }
-                ORDER BY rg_day.create_date desc, rg_hour.create_date desc, rg_member.id
+                ORDER BY rg_day.create_date desc, rg_hour.create_date desc
                 LIMIT ${ id ? 1 : 11 }`;
-
-
-    let timeStamp = new Date(new Date().setHours(0, 0, 0, 0)) / 1000;
-    let date = new Date();
-    if (date.getHours() <= 10) {
-        if (date.getMinutes() <= 7) {
-            timeStamp = timeStamp - 86400;
-        }
-    }
 
     data.list = await query(sql, async (items, connection) => {
         let saveData = items.map(async item => {
@@ -179,23 +170,34 @@ async function queryMemberDayData(id, type) {
     return data
 }
 
-// 查询成员24小时数据
-async function queryMemberHourData(id) {
-
+// 查询成员24/一个月小时数据
+async function queryMemberHourData(id, type) {
     let data = {};
-    data['list'] = await query(
-        `SELECT 
+    if (type === 'day') {
+        data['list'] = await query(
+            `SELECT 
         id,
         UNIX_TIMESTAMP(create_date) AS create_date,
         baike_browse,baike_flowers,weibo_forward,weibo_comment,weibo_like,weibo_fans,doki_fans,super_rank,super_read,super_post,super_fans
         FROM laimeiyun_data.rg_hour 
         WHERE id = ${id} 
         ORDER BY create_date desc LIMIT 0,25`
-    );
-
+        );
+    } else {
+        data['list'] = await query(
+            `SELECT 
+             id,
+        UNIX_TIMESTAMP(create_date) AS create_date,
+        baike_browse,baike_flowers,weibo_forward,weibo_comment,weibo_like,weibo_fans,doki_fans,super_rank,super_read,super_post,super_fans
+        FROM laimeiyun_data.rg_hour
+        WHERE id = ${id}
+        AND DATE_FORMAT(create_date,'%H') = 23
+        ORDER BY create_date desc
+        LIMIT 31`
+        );
+    }
     return data
 }
-
 
 module.exports = {
     query,

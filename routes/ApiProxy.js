@@ -19,10 +19,10 @@ router.post('/test', async (ctx, next) => {
 });
 
 router.post('/ip/:key', async (ctx, next) => {
-    if (ctx.params.key === key) {
-        let data = rp({
-            // url: 'http://gec.ip3366.net/api/?key=20180808185702582&getnum=1&anonymoustype=3&filter=1&area=1&order=2&formats=2&proxytype=1'
-        })
+    if (ctx.params.key === key && !ctx.body) {
+        ctx.body = await rp({
+             url: 'http://gec.ip3366.net/api/?key=20180808185702582&getnum=1&anonymoustype=3&filter=1&area=1&order=2&formats=2&proxytype=1'
+        });
     }
     await next();
 });

@@ -60,4 +60,7 @@ typings/
 # next.js build output
 .next
 
+# other
+key.txt
 .idea
+routes/ApiProxy.js

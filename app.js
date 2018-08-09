@@ -42,10 +42,14 @@ const member = require('./routes/ApiMember');
 const fast = require('./routes/ApiFast');
 const day = require('./routes/ApiDay');
 const hour = require('./routes/ApiHour');
+const newstar = require('./routes/ApiStar');
+const proxy = require('./routes/ApiProxy');
 app.use(member.routes(), member.allowedMethods());
 app.use(fast.routes(), fast.allowedMethods());
 app.use(day.routes(), day.allowedMethods());
 app.use(hour.routes(), hour.allowedMethods());
+app.use(newstar.routes(), newstar.allowedMethods());
+app.use(proxy.routes(), proxy.allowedMethods());
 
 // 错误监听
 app.on('error', (err, ctx) => {

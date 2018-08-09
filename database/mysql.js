@@ -199,12 +199,40 @@ async function queryMemberHourData(id, type) {
     return data
 }
 
+// 获取新星榜数据
+async function queryNewStarData(type) {
+    // new all
+  let data = {};
+  let sql  = '';
+
+  if (type === 'new') {
+    sql = `SELECT FROM_UNIXTIME(UNIX_TIMESTAMP(create_date) - 86400,'%Y年%m月%d日') AS create_date,
+            name,rank,total,\`read\`,read_total,interactive,int_total,influences,inf_total,love,love_total
+            FROM laimeiyun_data.rg_newstar AS rg_newstar
+            WHERE 
+            FROM_UNIXTIME(UNIX_TIMESTAMP(create_date) - 86400,'%m') = MONTH(CURDATE())
+            ORDER BY create_date desc , rank asc
+            LIMIT 50
+            `;
+  } else {
+    sql = `SELECT FROM_UNIXTIME(UNIX_TIMESTAMP(create_date) - 86400,'%Y年%m月%d日') AS create_date,
+            name,rank,total,\`read\`,read_total,interactive,int_total,influences,inf_total,love,love_total
+            FROM laimeiyun_data.rg_newstar AS rg_newstar
+            WHERE 
+            FROM_UNIXTIME(UNIX_TIMESTAMP(create_date) - 86400,'%m') = MONTH(CURDATE())
+            ORDER BY create_date desc , rank asc
+            `;
+  }
+  return await query(sql);
+}
+
 module.exports = {
     query,
     queryMemberBase,
     queryMemberInfo,
     queryMemberDayData,
-    queryMemberHourData
+    queryMemberHourData,
+    queryNewStarData
 };
 
 if (require.main === module) {

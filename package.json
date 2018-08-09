@@ -16,6 +16,7 @@
     "koa-router": "^7.4.0",
     "koa2-cors": "^2.0.6",
     "mysql2": "^1.5.3",
+    "node-xlsx": "^0.12.1",
     "request": "^2.87.0",
     "request-promise-native": "^1.0.5"
   },

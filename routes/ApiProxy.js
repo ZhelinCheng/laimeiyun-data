@@ -38,13 +38,13 @@ router.get('/ip/:key', async (ctx, next) => {
             if (!data.success) {
                 saveData.data = {
                     url: '',
-                    outTime: time
+                    timeout: time
                 };
             } else {
                 data = data.data[0];
                 saveData.data = {
                     url: `http://${data.ip}:${data.port}`,
-                    outTime: new Date(data.outTime).getTime()
+                    timeout: new Date(data.outTime).getTime()
                 };
             }
 
@@ -52,6 +52,11 @@ router.get('/ip/:key', async (ctx, next) => {
         }
 
         ctx.body = saveData.data;
+    } else if (ctx.params.key !== key[1]) {
+        ctx.body = {
+            url: '',
+            msg: '非法请求'
+        }
     }
     await next();
 });

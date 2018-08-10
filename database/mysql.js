@@ -36,7 +36,7 @@ async function queryMemberInfo(id) {
     if (id === 'all') id = null;
 
     let data = {};
-
+    let date = parseInt(new Date().getTime() / 1000, 10);
     let sql = `SELECT 
                 rg_member.id, 
                 rg_member.name, 
@@ -70,8 +70,10 @@ async function queryMemberInfo(id) {
                 laimeiyun_data.rg_hour AS rg_hour
                 WHERE rg_member.id = rg_hour.id
                 AND rg_member.id = rg_day.id
+                AND UNIX_TIMESTAMP(rg_hour.create_date) > ${date - 3600}
+				AND UNIX_TIMESTAMP(rg_day.create_date) > ${date - 86400}   
                 ${ id ? 'AND rg_member.id = ' + id : '' }
-                ORDER BY rg_day.create_date desc, rg_hour.create_date desc
+                ORDER BY rg_day.create_date desc, rg_hour.create_date desc, rg_member.id asc
                 LIMIT ${ id ? 1 : 11 }`;
 
     data.list = await query(sql, async (items, connection) => {
@@ -92,6 +94,7 @@ async function queryMemberInfo(id) {
                 rg_hour.super_fans
                 FROM laimeiyun_data.rg_hour AS rg_hour
                 WHERE rg_hour.id = ${item.id}
+                AND UNIX_TIMESTAMP(rg_hour.create_date) > ${date - 345600}   
                 ORDER BY rg_hour.create_date desc
                 LIMIT 1,1`
             );
@@ -107,6 +110,7 @@ async function queryMemberInfo(id) {
                 rg_day.weibo_love
                 FROM laimeiyun_data.rg_day AS rg_day
                 WHERE rg_day.id = ${item.id}
+                AND UNIX_TIMESTAMP(rg_day.create_date) > ${date - 345600}   
                 ORDER BY rg_day.create_date desc
                 LIMIT 1,1`
             );

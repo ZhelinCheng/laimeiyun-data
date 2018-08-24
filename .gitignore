@@ -64,3 +64,4 @@ typings/
 key.txt
 .idea
 routes/ApiProxy.js
+config.json

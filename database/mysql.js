@@ -51,6 +51,8 @@ async function queryMemberInfo(id) {
                 rg_hour.weibo_like,
                 rg_hour.weibo_fans,
                 rg_hour.doki_fans,
+                rg_hour.doki_popularity,
+                rg_hour.doki_rank,
                 rg_hour.super_rank,
                 rg_hour.super_read,
                 rg_hour.super_post,
@@ -70,7 +72,7 @@ async function queryMemberInfo(id) {
                 laimeiyun_data.rg_hour AS rg_hour
                 WHERE rg_member.id = rg_hour.id
                 AND rg_member.id = rg_day.id
-                AND UNIX_TIMESTAMP(rg_hour.create_date) > ${date - 3600}
+                AND UNIX_TIMESTAMP(rg_hour.create_date) > ${date - 7200}
 				AND UNIX_TIMESTAMP(rg_day.create_date) > ${date - 86400}   
                 ${ id ? 'AND rg_member.id = ' + id : '' }
                 ORDER BY rg_day.create_date desc, rg_hour.create_date desc, rg_member.id asc
@@ -88,6 +90,8 @@ async function queryMemberInfo(id) {
                 rg_hour.weibo_like,
                 rg_hour.weibo_fans,
                 rg_hour.doki_fans,
+                rg_hour.doki_popularity,
+                rg_hour.doki_rank,
                 rg_hour.super_rank,
                 rg_hour.super_read,
                 rg_hour.super_post,
@@ -182,7 +186,19 @@ async function queryMemberHourData(id, type) {
             `SELECT 
         id,
         UNIX_TIMESTAMP(create_date) AS create_date,
-        baike_browse,baike_flowers,weibo_forward,weibo_comment,weibo_like,weibo_fans,doki_fans,super_rank,super_read,super_post,super_fans
+        baike_browse,
+        baike_flowers,
+        weibo_forward,
+        weibo_comment,
+        weibo_like,
+        weibo_fans,
+        doki_fans,
+        doki_popularity,
+        doki_rank,
+        super_rank,
+        super_read,
+        super_post,
+        super_fans
         FROM laimeiyun_data.rg_hour 
         WHERE id = ${id} 
         ORDER BY create_date desc LIMIT 0,25`
@@ -192,7 +208,19 @@ async function queryMemberHourData(id, type) {
             `SELECT 
              id,
         UNIX_TIMESTAMP(create_date) AS create_date,
-        baike_browse,baike_flowers,weibo_forward,weibo_comment,weibo_like,weibo_fans,doki_fans,super_rank,super_read,super_post,super_fans
+        baike_browse,
+        baike_flowers,
+        weibo_forward,
+        weibo_comment,
+        weibo_like,
+        weibo_fans,
+        doki_fans,
+        doki_popularity,
+        doki_rank,
+        super_rank,
+        super_read,
+        super_post,
+        super_fans
         FROM laimeiyun_data.rg_hour
         WHERE id = ${id}
         AND DATE_FORMAT(create_date,'%H') = 23
